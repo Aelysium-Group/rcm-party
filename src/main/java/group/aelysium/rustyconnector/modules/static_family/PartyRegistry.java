@@ -22,23 +22,23 @@ import java.util.concurrent.TimeUnit;
 
 public class PartyRegistry implements ModuleParticle {
     private final ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
-    protected Party.Config config;
+    protected PartyConfig config;
     protected final Map<UUID, Party> parties = new ConcurrentHashMap<>();
     protected final Map<UUID, Party> players = new ConcurrentHashMap<>();
     protected final Map<UUID, Party.Invitation> invitations = new ConcurrentHashMap<>();
 
     public PartyRegistry(
-            Party.Config config
+            PartyConfig config
     ) {
         this.config = config;
-        if (config.friendsOnly())
+        if (config.friendsOnly)
             if (RC.Kernel().fetchModule("FriendRegistry") == null)
                 throw new IllegalStateException("If you enable 'friends-only' you must also install the 'rcm-friend' module.");
 
         this.cleaner.schedule(this::clean, 2, TimeUnit.MINUTES);
     }
 
-    public @NotNull Party.Config config() {
+    public @NotNull PartyConfig config() {
         return this.config;
     }
 
@@ -112,7 +112,7 @@ public class PartyRegistry implements ModuleParticle {
         @NotNull
         @Override
         public PartyRegistry onStart() throws Exception {
-            return new PartyRegistry();
+            return new PartyRegistry(PartyConfig.New());
         }
     }
 

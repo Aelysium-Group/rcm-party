@@ -62,7 +62,7 @@ public class Party {
     }
 
     public boolean full() {
-        return this.players.size() >= this.registry.config().maxMembers();
+        return this.players.size() >= this.registry.config().maxMember;
     }
 
     public void server(@NotNull String id) {
@@ -85,7 +85,7 @@ public class Party {
         this.invitations.remove(player);
     }
     public @NotNull Invitation invite(@NotNull UUID sender, @NotNull UUID target) throws IllegalAccessException {
-        if(this.registry.config().onlyLeaderCanInvite())
+        if(this.registry.config().partyLeader_onlyLeaderCanInvite)
             if(!this.leader.get().equals(sender))
                 throw new IllegalAccessException("Only the party leader is allowed to send party invites.");
 
@@ -96,9 +96,9 @@ public class Party {
 
     public @NotNull JoinAttempt join(@NotNull UUID player) {
         if(this.closed.get()) return new JoinAttempt(false, "That party no-longer exists.");
-        if(this.players.size() >= this.registry.config().maxMembers()) return new JoinAttempt(false, "That party is full.");
+        if(this.players.size() >= this.registry.config().maxMember) return new JoinAttempt(false, "That party is full.");
         if(this.players.contains(player))  return new JoinAttempt(false, "You're already in the party.");
-        if(this.registry.config().friendsOnly()) {
+        if(this.registry.config().friendsOnly) {
             try {
                 return false; // Need to properly implement the friends module.
             } catch (TimeoutException e) {
@@ -117,7 +117,7 @@ public class Party {
             return;
         }
 
-        if (this.registry.config().disbandOnLeaderQuit()) {
+        if (this.registry.config().partyLeader_disbandOnLeaderQuit) {
             this.registry.disbandParty(this);
             return;
         }
@@ -149,18 +149,6 @@ public class Party {
         return this.closed.get();
     }
 
-    public record Config (
-        int maxMembers,
-        boolean friendsOnly,
-        boolean localOnly,
-        boolean onlyLeaderCanInvite,
-        boolean onlyLeaderCanKick,
-        boolean onlyLeaderCanSwitchServers,
-        boolean disbandOnLeaderQuit,
-        @NotNull Player.Connection.Power switchPower,
-        @NotNull PartyRegistry.OverflowHandler overflowHandler
-    ) {}
-
     public static class Invitation {
         private final Party party;
         private final UUID sender;
@@ -188,7 +176,7 @@ public class Party {
             return this.target;
         }
         public Status status() {
-            return this.status;
+            return this.status.get();
         }
         public boolean expired() {
             return this.issuedAt.plusSeconds(60).isBefore(Instant.now());

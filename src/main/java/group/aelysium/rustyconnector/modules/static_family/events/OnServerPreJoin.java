@@ -5,6 +5,7 @@ import group.aelysium.rustyconnector.common.errors.Error;
 import group.aelysium.rustyconnector.common.events.EventListener;
 import group.aelysium.rustyconnector.common.events.EventPriority;
 import group.aelysium.rustyconnector.modules.static_family.Party;
+import group.aelysium.rustyconnector.modules.static_family.PartyConfig;
 import group.aelysium.rustyconnector.modules.static_family.PartyRegistry;
 import group.aelysium.rustyconnector.proxy.events.ServerPreJoinEvent;
 import group.aelysium.rustyconnector.proxy.family.Server;
@@ -24,17 +25,17 @@ public class OnServerPreJoin {
             Party party = parties.fetch(event.player().uuid()).orElse(null);
             if(party == null) return;
 
-            Party.Config config = parties.config();
+            PartyConfig config = parties.config();
 
-            if(config.onlyLeaderCanSwitchServers() && !party.leader().equals(event.player().uuid())) {
+            if(config.partyLeader_onlyLeaderCanSwitch && !party.leader().equals(event.player().uuid())) {
                 event.canceled(true, "Only the party leader can switch servers.");
                 return;
             }
 
             long availableSlots = 100;
-            if(config.switchPower().equals(Player.Connection.Power.MINIMAL))
+            if(config.switchingServers_switchPower.equals(Player.Connection.Power.MINIMAL))
                 availableSlots = (targetServer.softPlayerCap() - targetServer.players());
-            if(config.switchPower().equals(Player.Connection.Power.MODERATE))
+            if(config.switchingServers_switchPower.equals(Player.Connection.Power.MODERATE))
                 availableSlots = (targetServer.hardPlayerCap() - targetServer.players());
             // AGGRESSIVE doesn't matter because it would just set "willFail" to "false".
 
@@ -46,7 +47,7 @@ public class OnServerPreJoin {
             Set<UUID> leftBehind = new HashSet<>();
             List<UUID> preparedForConnection = new ArrayList<>();
             if(availableSlots < party.size()) {
-                if(config.overflowHandler().equals(PartyRegistry.OverflowHandler.BLOCK_SWITCH)) {
+                if(config.switchingServers_overflowHandler.equals(PartyRegistry.OverflowHandler.BLOCK_SWITCH)) {
                     event.canceled(true, "The target server doesn't have enough space for your party. Try again later.");
                     return;
                 }
@@ -64,10 +65,10 @@ public class OnServerPreJoin {
                 }
                 preparedForConnection.removeAll(leftBehind);
 
-                if(config.overflowHandler().equals(PartyRegistry.OverflowHandler.KICK)) {
+                if(config.switchingServers_overflowHandler.equals(PartyRegistry.OverflowHandler.KICK)) {
                     leftBehind.forEach(u -> party.kick(u, "The party moved to a server that didn't have enough room for you."));
                 }
-                if(config.overflowHandler().equals(PartyRegistry.OverflowHandler.ABANDON)) {
+                if(config.switchingServers_overflowHandler.equals(PartyRegistry.OverflowHandler.ABANDON)) {
                     leftBehind.forEach(u -> {
                         try {
                             RC.P.Player(u).orElseThrow().message(Component.text("The party moved to a server that didn't have enough room for you."));
