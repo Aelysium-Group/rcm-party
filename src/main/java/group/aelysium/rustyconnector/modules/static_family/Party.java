@@ -153,8 +153,8 @@ public class Party {
         private final Party party;
         private final UUID sender;
         private final UUID target;
-        private AtomicReference<Status> status = new AtomicReference<>(Status.PENDING);
-        private Instant issuedAt = Instant.now();
+        private final AtomicReference<Status> status = new AtomicReference<>(Status.PENDING);
+        private final Instant issuedAt = Instant.now();
 
         protected Invitation(
                 @NotNull Party party,
