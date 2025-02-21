@@ -99,6 +99,7 @@ public class PartyRegistry implements ModuleParticle {
         this.invitations.clear();
         this.players.clear();
         this.parties.clear();
+        this.cleaner.close();
     }
 
     public static class Tinder extends ExternalModuleTinder<PartyRegistry> {
