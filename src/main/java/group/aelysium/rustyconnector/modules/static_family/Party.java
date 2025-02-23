@@ -149,7 +149,20 @@ public class Party {
         return this.closed.get();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Party party = (Party) o;
+        return Objects.equals(uuid, party.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uuid);
+    }
+
     public static class Invitation {
+        private final UUID uuid = UUID.randomUUID();
         private final Party party;
         private final UUID sender;
         private final UUID target;
@@ -197,6 +210,18 @@ public class Party {
         public void ignore() {
             if(!this.status.get().equals(Status.PENDING)) return;
             this.status.set(Status.IGNORED);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Invitation that = (Invitation) o;
+            return Objects.equals(uuid, that.uuid);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(uuid);
         }
 
         public enum Status {
