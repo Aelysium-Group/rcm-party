@@ -1,26 +1,26 @@
-package group.aelysium.rustyconnector.modules.static_family;
+package group.aelysium.rustyconnector.modules.party;
 
 import group.aelysium.rustyconnector.RC;
 import group.aelysium.rustyconnector.common.errors.Error;
 import group.aelysium.rustyconnector.common.events.EventManager;
-import group.aelysium.rustyconnector.common.modules.ExternalModuleTinder;
-import group.aelysium.rustyconnector.common.modules.ModuleParticle;
-import group.aelysium.rustyconnector.modules.static_family.events.OnServerPreJoin;
+import group.aelysium.rustyconnector.common.modules.ExternalModuleBuilder;
+import group.aelysium.rustyconnector.common.modules.Module;
+import group.aelysium.rustyconnector.modules.party.events.OnServerPreJoin;
 import group.aelysium.rustyconnector.proxy.ProxyKernel;
 import group.aelysium.rustyconnector.proxy.family.Server;
 import group.aelysium.rustyconnector.proxy.player.Player;
-import group.aelysium.rustyconnector.shaded.group.aelysium.ara.Particle;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class PartyRegistry implements ModuleParticle {
+public class PartyRegistry implements Module {
     private final ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor();
     protected PartyConfig config;
     protected final Map<UUID, Party> parties = new ConcurrentHashMap<>();
@@ -102,16 +102,16 @@ public class PartyRegistry implements ModuleParticle {
         this.cleaner.close();
     }
 
-    public static class Tinder extends ExternalModuleTinder<PartyRegistry> {
-        public void bind(@NotNull ProxyKernel kernel, @NotNull Particle instance) {
-            kernel.fetchModule("EventManager").executeNow(e->{
+    public static class Builder extends ExternalModuleBuilder<PartyRegistry> {
+        public void bind(@NotNull ProxyKernel kernel, @NotNull PartyRegistry instance) {
+            kernel.fetchModule("EventManager").onStart(e->{
                 ((EventManager) e).listen(new OnServerPreJoin());
             });
         }
 
         @NotNull
         @Override
-        public PartyRegistry onStart() throws Exception {
+        public PartyRegistry onStart(@NotNull Path dataDirectory) throws Exception {
             return new PartyRegistry(PartyConfig.New());
         }
     }

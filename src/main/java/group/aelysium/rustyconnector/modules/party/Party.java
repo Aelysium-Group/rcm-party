@@ -1,4 +1,4 @@
-package group.aelysium.rustyconnector.modules.static_family;
+package group.aelysium.rustyconnector.modules.party;
 
 import group.aelysium.rustyconnector.RC;
 import group.aelysium.rustyconnector.common.errors.Error;
@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -100,8 +99,8 @@ public class Party {
         if(this.players.contains(player))  return new JoinAttempt(false, "You're already in the party.");
         if(this.registry.config().friendsOnly) {
             try {
-                return false; // Need to properly implement the friends module.
-            } catch (TimeoutException e) {
+                return new JoinAttempt(false, "");
+            } catch (Exception e) {
                 RC.Error(Error.from(e).detail("Reason", "The PartyRegistry requires that players are friends with the party leader before they can join. However the FriendRegistry module didn't respond in time for us to validate. We did not let the player join the Party."));
                 return new JoinAttempt(false, "Only friends of the current party leader can join the party.");
             }

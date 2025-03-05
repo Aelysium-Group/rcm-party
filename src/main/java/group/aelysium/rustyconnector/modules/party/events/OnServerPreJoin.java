@@ -1,12 +1,12 @@
-package group.aelysium.rustyconnector.modules.static_family.events;
+package group.aelysium.rustyconnector.modules.party.events;
 
 import group.aelysium.rustyconnector.RC;
 import group.aelysium.rustyconnector.common.errors.Error;
 import group.aelysium.rustyconnector.common.events.EventListener;
 import group.aelysium.rustyconnector.common.events.EventPriority;
-import group.aelysium.rustyconnector.modules.static_family.Party;
-import group.aelysium.rustyconnector.modules.static_family.PartyConfig;
-import group.aelysium.rustyconnector.modules.static_family.PartyRegistry;
+import group.aelysium.rustyconnector.modules.party.Party;
+import group.aelysium.rustyconnector.modules.party.PartyConfig;
+import group.aelysium.rustyconnector.modules.party.PartyRegistry;
 import group.aelysium.rustyconnector.proxy.events.ServerPreJoinEvent;
 import group.aelysium.rustyconnector.proxy.family.Server;
 import group.aelysium.rustyconnector.proxy.player.Player;
@@ -19,15 +19,15 @@ public class OnServerPreJoin {
     @EventListener(order = EventPriority.HIGH)
     public void handle(ServerPreJoinEvent event) {
         try {
-            Server targetServer = event.server();
+            Server targetServer = event.server;
             PartyRegistry parties = (PartyRegistry) Objects.requireNonNull(RC.Kernel().fetchModule("PartyRegistry")).orElseThrow();
 
-            Party party = parties.fetch(event.player().uuid()).orElse(null);
+            Party party = parties.fetch(event.player.uuid()).orElse(null);
             if(party == null) return;
 
             PartyConfig config = parties.config();
 
-            if(config.partyLeader_onlyLeaderCanSwitch && !party.leader().equals(event.player().uuid())) {
+            if(config.partyLeader_onlyLeaderCanSwitch && !party.leader().equals(event.player.uuid())) {
                 event.canceled(true, "Only the party leader can switch servers.");
                 return;
             }
@@ -79,21 +79,21 @@ public class OnServerPreJoin {
 
             preparedForConnection.forEach(u -> {
                 try {
-                    Player.Connection.Request request = RC.P.Adapter().connectServer(event.server(), RC.P.Player(u).orElseThrow());
+                    Player.Connection.Request request = RC.P.Adapter().connectServer(event.server, RC.P.Player(u).orElseThrow());
                     Player.Connection.Result result = request.result().get(7, TimeUnit.SECONDS);
                     if(result.connected()) return;
 
-                    event.player().message(result.message());
+                    event.player.message(result.message());
                 } catch (Exception e) {
                     RC.Error(Error.from(e).whileAttempting("To help a party member follow their party leader.")
-                            .detail("Server", event.server().id())
+                            .detail("Server", event.server.id())
                             .detail("Party Players", party.size())
                             .detail("Party Leader", party.leader())
                     );
                 }
             });
 
-            party.server(event.server().id());
+            party.server(event.server.id());
         } catch (Exception e) {
             RC.Error(Error.from(e).whileAttempting("To check if the player is a member of a party. This exception won't affect the player's ability to connect to this or any other server."));
         }

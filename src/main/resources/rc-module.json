@@ -1,11 +1,11 @@
 {
-  "main": "group.aelysium.rustyconnector.modules.party.PartyRegistry$Tinder",
+  "main": "group.aelysium.rustyconnector.modules.party.PartyRegistry$Builder",
   "name": "PartyRegistry",
   "description": "Provides Static Family services for the FamilyRegistry.",
   "environments": [
     "proxy"
   ],
-  "softDependency": [
+  "softDependencies": [
     "friendregistry"
   ]
 }

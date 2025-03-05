@@ -1,17 +1,9 @@
-package group.aelysium.rustyconnector.modules.static_family;
+package group.aelysium.rustyconnector.modules.party;
 
-import group.aelysium.declarative_yaml.DeclarativeYAML;
-import group.aelysium.declarative_yaml.annotations.*;
-import group.aelysium.declarative_yaml.lib.Printer;
-import group.aelysium.rustyconnector.common.magic_link.packet.Packet;
 import group.aelysium.rustyconnector.proxy.player.Player;
-import group.aelysium.rustyconnector.proxy.util.LiquidTimestamp;
-import group.aelysium.rustyconnector.shaded.com.google.code.gson.gson.Gson;
-import group.aelysium.rustyconnector.shaded.com.google.code.gson.gson.JsonObject;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Map;
+import group.aelysium.rustyconnector.shaded.group.aelysium.declarative_yaml.DeclarativeYAML;
+import group.aelysium.rustyconnector.shaded.group.aelysium.declarative_yaml.annotations.*;
+import group.aelysium.rustyconnector.shaded.group.aelysium.declarative_yaml.lib.Printer;
 
 @Namespace("rustyconnector-modules")
 @Config("/rcm-party/config.yml")
