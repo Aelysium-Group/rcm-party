@@ -21,7 +21,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'group.aelysium:rustyconnector-core:0.9.5'
+    compileOnly 'group.aelysium.rustyconnector:core:0.9.14'
+    compileOnly 'group.aelysium.rustyconnector:friend:0.9.0-2'
 
     compileOnly 'net.kyori:adventure-api:4.17.0'
 }
